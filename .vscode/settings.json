@@ -1,4 +1,14 @@
 {
+  "workbench.statusBar.visible": false,
+  "workbench.editor.showTabs": "single",
+  "workbench.editor.enablePreview": false,
+  "workbench.activityBar.location": "hidden",
+  "prisma.file": "packages/db/prisma/schema.prisma",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "eslint.workingDirectories": [
     {
       "mode": "auto"

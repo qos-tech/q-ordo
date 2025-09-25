@@ -1,135 +1,92 @@
-# Turborepo starter
+Ordo
 
-This Turborepo starter is maintained by the Turborepo core team.
+<p align="center">
+<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDYwMCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxvZ29HcmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM0RjQ2RTU7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzA4OTFCMjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8c3R5bGU+CiAgICAgICAgQGltcG9ydCB1cmwoJ2h0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9UmFsZXdheTp3Z2h0QDcwMCZkaXNwbGF5PXN3YXAnKTsKICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiIC8+CiAgCiAgPCEtLSBBc3NpbWJvbCBhYnN0cmF0byBkZSBPIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1MCAxNTApIj4KICAgIDxwYXRoIGQ9Ik0gNjAgMCBBIDYwIDYwIDAgMCAxIC0zMCA1MS45NiBMIC0xNSAyNS45OCBBIDMwIDMwIDAgMCAwIDMwIDAgWiIgZmlsbD0idXJsKCNsb2dvR3JhZGllbnQpIi8+CiAgICA8cGF0aCBkPSJNIC0zMCA1MS45NiBBIDYwIDYwIDAgMCAxIC0zMCAtNTEuOTYgTCAtMTUgLTI1Ljk4IEEgMzAgMzAgMCAwIDAgLTE1IDI1Ljk4IFoiIGZpbGw9InVybCgjbG9nb0dyYWRpZW50KSIgb3BhY2l0eT0iMC44Ii8+CiAgICA8cGF0aCBkPSJNIC0zMCAtNTEuOTYgQSA2MCA2MCAwIDAgMSA2MCAwIEwgMzAgMCBBIDMwIDMwIDAgMCAwIC0xNSAtMjUuOTggWiIgZmlsbD0idXJsKCNsb2dvR3JhZGllbnQpIiBvcGFjaXR5PSIwLjYiLz4KICA8L2c+CiAgCiAgPCEtLSBUZXh0byAtLT4KICA8dGV4dCB4PSIzMDAiIHk9IjE2NSIgZm9udC1mYW1pbHk9IlJhbGV3YXksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iODAiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ic3RhcnQiPgogICAgT3JkbwogIDwvdGV4dD4KPC9zdmc+" alt="Ordo Project Banner">
+</p>
 
-## Using this example
+<p align="center">
+<strong>A modern, open-source platform for client management and billing automation, designed as a powerful alternative for the web hosting industry and digital agencies.</strong>
+</p>
 
-Run the following command:
+<p align="center">
+<a href="#-about-the-project">About</a> •
+<a href="#-tech-stack">Tech Stack</a> •
+<a href="#-features">Features</a> •
+<a href="#-project-status--roadmap">Roadmap</a> •
+<a href="#-contributing">Contributing</a>
+</p>
 
-```sh
-npx create-turbo@latest
-```
+🚀 About the Project
+Ordo (from the Latin for "order", "organization") is a modern, self-hostable billing platform built from the ground up to provide a complete, open-source solution for client management, automated invoicing, and service provisioning. It's tailored for agencies, hosting providers, SaaS companies, and modern digital businesses.
 
-## What's inside?
+Our goal is to create a robust, type-safe, and scalable alternative to traditional billing software, built entirely on a modern TypeScript stack.
 
-This Turborepo includes the following packages/apps:
+🛠️ Tech Stack
+Ordo is built as a monorepo using Turborepo to manage the backend API and the frontend web application.
 
-### Apps and Packages
+Backend: Fastify, Node.js
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Frontend: Next.js, React, Tailwind CSS
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Database: PostgreSQL
 
-### Utilities
+ORM: Prisma
 
-This Turborepo has some additional tools already setup for you:
+Language: TypeScript
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+API Validation: Zod
 
-### Build
+API Documentation: Swagger (OpenAPI)
 
-To build all apps and packages, run the following command:
+✨ Features
+Our architecture is designed to be comprehensive and modular, covering the entire client lifecycle.
 
-```
-cd my-turborepo
+Multi-tenant Architecture: Manage multiple Service Providers and their respective Companies (clients) within a single instance.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+Client Management: A robust system for managing companies and their various points of contact.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+User & Permission System: A flexible, role-based access control system (OWNER, ADMIN, MEMBER) linking users to companies.
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Authentication: Secure authentication with email/password and ready for Social Logins (OAuth).
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+Product Catalog: A powerful catalog with a flexible pricing model supporting one-time and recurring billing.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+Order Management: A streamlined system for clients to place new orders.
 
-### Develop
+Automated Billing: A complete invoicing system designed for automated generation of recurring invoices.
 
-To develop all apps and packages, run the following command:
+And much more... (Support Tickets, Promotions, Affiliates, Knowledgebase)
 
-```
-cd my-turborepo
+🗺️ Project Status & Roadmap
+This project is under active development. Our roadmap is divided into sprints, showing what we've accomplished and what we're working on now.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+Sprint 1: Foundation & Client Onboarding (API)
+Prazo: 2 de Outubro de 2025
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+✅ Concluído
+[x] Tarefa 1: Inicializar o Monorepo com Turborepo.
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+[x] Tarefa 2: Configurar ESLint, Prettier e TypeScript partilhados.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+[x] Configurações do VS Code: Padronizar o ambiente de desenvolvimento.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+⏳ Em Desenvolvimento
+[ ] Tarefa 3: Modelagem Inicial do Banco de Dados (Prisma).
 
-### Remote Caching
+[ ] Tarefa 4: Configurar Servidor Fastify na API.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+[ ] Tarefa 5: Implementar Autenticação JWT.
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+[ ] Tarefa 6: Criar Endpoint de Cadastro de Cliente (CRUD).
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+[ ] Tarefa 7: Documentar Endpoints com Swagger.
 
-```
-cd my-turborepo
+💡 Sprint 2 (Planeamento)
+[ ] Gestão de Utilizadores: API para que os donos das empresas possam convidar e gerir os membros da sua equipa.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+[ ] Gestão do Catálogo de Produtos: API CRUD completa para gerir Produtos, Categorias e Preços.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+[ ] Frontend Foundation: Configuração inicial da aplicação Next.js para a área do cliente.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+❤️ Contributing
+Ordo is an open-source project, and contributions are welcome! Whether you're a developer, designer, or just have great ideas, we'd love for you to get involved. Please check
