@@ -1,0 +1,16 @@
+services:
+  pg:
+    container_name: q-ordo-database
+    image: postgres:16-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=q-ordo
+    volumes:
+      - q-ordo-pg-data:/var/lib/postgresql/data
+
+volumes:
+  q-ordo-pg-data:
