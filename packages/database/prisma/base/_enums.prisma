@@ -1,0 +1,46 @@
+enum Status {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum CompanyRole {
+  OWNER
+  ADMIN
+  MEMBER
+  BILLING
+}
+
+enum SystemRole {
+  SUPER_ADMIN // Permissão total sobre o sistema.
+  STAFF       // Acesso geral ao painel de administração.
+  BILLING     // Acesso apenas a módulos financeiros.
+  SUPPORT     // Acesso apenas a módulos de suporte.
+}
+
+enum ContactType {
+  GENERAL
+  BILLING
+  TECHNICAL
+}
+
+enum NotificationType {
+  BILLING   // Faturas, lembretes de pagamento, confirmações.
+  SUPPORT   // Atualizações de tickets de suporte.
+  MARKETING // Newsletters, promoções, anúncios.
+  GENERAL   // Anúncios gerais de serviço, manutenções.
+}
+
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  VIEW
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+}

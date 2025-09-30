@@ -1,0 +1,49 @@
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  name         String
+  phone        String?
+  passwordHash String? @map("password_hash")
+  status       Status  @default(ACTIVE)
+  systemRole SystemRole? @map("system_role") // Para configurar um membro da equipe interna
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  memberships Membership[]
+  notificationSettings UserNotificationSetting[]
+
+  // --- Relações de Auditoria ---
+  auditLogs        AuditLog[] // O que este usuário fez
+  createdContacts  Contact[] @relation("CreatedContacts")
+  updatedContacts  Contact[] @relation("UpdatedContacts")
+  createdCompanies Company[] @relation("CreatedCompanies")
+  updatedCompanies Company[] @relation("UpdatedCompanies")
+
+  @@map("users")
+}
+
+model Membership {
+  userId    String      @map("user_id")
+  companyId String      @map("company_id")
+  role      CompanyRole @default(MEMBER)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, companyId])
+  @@map("memberships")
+}
+
+model UserNotificationSetting {
+  id        String              @id @default(cuid())
+  userId    String              @map("user_id")
+  type      NotificationType
+  channel   NotificationChannel
+  isEnabled Boolean             @default(true) @map("is_enabled")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, channel])
+  @@map("user_notification_settings")
+}
