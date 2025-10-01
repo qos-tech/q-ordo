@@ -12,6 +12,8 @@ import { env } from '@repo/env'
 import { errorHandler } from '@/error-handler.js'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
+import { authPlugin } from '@/plugins/auth'
+import { authRoutes } from './modules/auth/auth.routes'
 
 const loggerConfig =
   env.NODE_ENV === 'development'
@@ -66,7 +68,11 @@ export async function build() {
     secret: env.JWT_SECRET,
   })
 
+  app.register(authPlugin)
+
   app.register(fastifyCors, { origin: env.CORS_ORIGIN })
+
+  app.register(authRoutes)
 
   return app
 }
