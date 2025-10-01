@@ -1,5 +1,5 @@
 {
-  "name": "@repo/db",
+  "name": "@repo/database",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
@@ -12,7 +12,6 @@
     "db:studio": "pnpm run db:import && pnpm prisma studio",
     "db:migrate:dev": "pnpm run db:import && pnpm prisma migrate dev",
     "db:migrate:deploy": "pnpm run db:import && pnpm prisma migrate deploy",
-    "postinstall": "pnpm run db:generate",
     "prisma": "pnpm env:load prisma",
     "env:load": "dotenv -e ../../.env --"
   },
