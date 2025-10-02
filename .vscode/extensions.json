@@ -1,5 +1,11 @@
 {
-    "recommendations": [
-        "prisma.prisma"
-    ]
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "Prisma.prisma",
+    "bradlc.vscode-tailwindcss-intellisense",
+    "eamodio.gitlens",
+    "mikestead.dotenv",
+    "PKief.material-icon-theme"
+  ]
 }
