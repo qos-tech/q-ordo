@@ -1,24 +1,24 @@
 model User {
-  id           String  @id @default(cuid())
-  email        String  @unique
+  id           String      @id @default(cuid())
+  email        String      @unique
   name         String
   phone        String?
-  passwordHash String? @map("password_hash")
-  status       Status  @default(ACTIVE)
-  systemRole SystemRole? @map("system_role") // Para configurar um membro da equipe interna
+  passwordHash String?     @map("password_hash")
+  status       Status      @default(ACTIVE)
+  systemRole   SystemRole? @map("system_role") // Para configurar um membro da equipe interna
 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships Membership[]
+  memberships          Membership[]
   notificationSettings UserNotificationSetting[]
 
   // --- Relações de Auditoria ---
   auditLogs        AuditLog[] // O que este usuário fez
-  createdContacts  Contact[] @relation("CreatedContacts")
-  updatedContacts  Contact[] @relation("UpdatedContacts")
-  createdCompanies Company[] @relation("CreatedCompanies")
-  updatedCompanies Company[] @relation("UpdatedCompanies")
+  createdContacts  Contact[]  @relation("CreatedContacts")
+  updatedContacts  Contact[]  @relation("UpdatedContacts")
+  createdCompanies Company[]  @relation("CreatedCompanies")
+  updatedCompanies Company[]  @relation("UpdatedCompanies")
 
   @@map("users")
 }

@@ -14,6 +14,7 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
 import { authPlugin } from '@/plugins/auth'
 import { authRoutes } from './modules/auth/auth.routes'
+import { clientRoutes } from './modules/clients'
 
 const loggerConfig =
   env.NODE_ENV === 'development'
@@ -72,7 +73,7 @@ export async function build() {
 
   app.register(fastifyCors, { origin: env.CORS_ORIGIN })
 
-  app.register(authRoutes)
+  app.register(clientRoutes, { prefix: '/clients' })
 
   return app
 }
