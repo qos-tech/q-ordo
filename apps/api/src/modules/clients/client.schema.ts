@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Status, ContactType } from '@repo/database'
 
 // =================================================================
 // INPUT SCHEMAS (Data that our API receives)
@@ -6,18 +7,12 @@ import { z } from 'zod'
 
 // --- Schema for CREATION (POST /clients) ---
 
-/**
- * Reusable schema for contact creation data.
- */
 const contactCreateSchema = z.object({
   fullName: z.string().min(3),
   email: z.string().email(),
   phone: z.string().optional(),
 })
 
-/**
- * Schema for the entire body of the client onboarding request.
- */
 export const createClientBodySchema = z
   .object({
     company: z.object({
@@ -60,16 +55,10 @@ export const createClientBodySchema = z
 
 // --- Schemas for READING (GET /clients) ---
 
-/**
- * Schema for URL parameters when fetching a single client (e.g., /clients/:id).
- */
 export const getClientParamsSchema = z.object({
   id: z.string().uuid('Invalid client ID format.'),
 })
 
-/**
- * Schema for query parameters for the client list endpoint (e.g., /clients?page=2&limit=10).
- */
 export const getClientsQuerySchema = z.object({
   page: z.coerce
     .number()
@@ -84,44 +73,65 @@ export const getClientsQuerySchema = z.object({
     .describe('Number of items per page.'),
 })
 
+// --- SCHEMAS FOR UPDATE (PATCH /clients/:id) ---
+
+/**
+ * Schema for updating a single contact. The `id` is optional.
+ * If an `id` is provided, it's an update. If not, it's a creation.
+ */
+const contactUpdateSchema = z.object({
+  id: z.string().uuid().optional(), // Optional ID for existing contacts
+  type: z.nativeEnum(ContactType),
+  fullName: z.string().min(3),
+  email: z.string().email(),
+  phone: z.string().optional().nullable(),
+  isPrimary: z.boolean().optional(),
+})
+
+/**
+ * Schema for the body of the client update request.
+ * All fields are optional, allowing for partial updates.
+ */
+export const updateClientBodySchema = z.object({
+  name: z.string().min(3).optional(),
+  status: z.nativeEnum(Status).optional(),
+  municipalRegistration: z.string().nullable().optional(),
+  addressStreet: z.string().nullable().optional(),
+  addressNumber: z.string().nullable().optional(),
+  addressComplement: z.string().nullable().optional(),
+  addressNeighborhood: z.string().nullable().optional(),
+  addressCity: z.string().nullable().optional(),
+  addressState: z.string().nullable().optional(),
+  addressZipCode: z.string().nullable().optional(),
+  contacts: z.array(contactUpdateSchema).optional(),
+})
+
 // =================================================================
 // OUTPUT SCHEMAS (Data that our API sends)
 // =================================================================
 
-/**
- * Schema for the successful response of the client creation endpoint.
- */
 export const createClientResponseSchema = z.object({
   companyId: z.string().uuid(),
   ownerId: z.string().uuid(),
 })
 
-/**
- * Schema for a single item in the client list response (GET /clients).
- */
 const clientListItemSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   taxId: z.string(),
-  status: z.string(),
+  status: z.nativeEnum(Status),
   createdAt: z.date(),
 })
 
-/**
- * Schema representing a single Contact in an API response.
- */
 const contactResponseSchema = z.object({
   id: z.string().uuid(),
-  type: z.string(),
+  type: z.nativeEnum(ContactType),
   fullName: z.string(),
   email: z.string().email(),
   phone: z.string().nullable(),
   isPrimary: z.boolean(),
 })
 
-/**
- * Schema for the detailed client response (GET /clients/:id).
- */
 export const getClientResponseSchema = z.object({
   client: clientListItemSchema.extend({
     municipalRegistration: z.string().nullable(),
@@ -136,12 +146,15 @@ export const getClientResponseSchema = z.object({
   }),
 })
 
-/**
- * Final schema for the response of fetching a list of clients.
- */
 export const getClientsResponseSchema = z.object({
   clients: z.array(clientListItemSchema),
 })
+
+/**
+ * We can reuse the getClientResponseSchema for the successful response of an update,
+ * as it already contains all the detailed client information.
+ */
+export const updateClientResponseSchema = getClientResponseSchema
 
 // =================================================================
 // TYPESCRIPT TYPES (Types for our application code)
@@ -150,3 +163,4 @@ export const getClientsResponseSchema = z.object({
 export type CreateClientBody = z.infer<typeof createClientBodySchema>
 export type GetClientParams = z.infer<typeof getClientParamsSchema>
 export type GetClientsQuery = z.infer<typeof getClientsQuerySchema>
+export type UpdateClientBody = z.infer<typeof updateClientBodySchema>

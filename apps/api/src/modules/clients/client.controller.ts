@@ -1,13 +1,21 @@
+// apps/api/src/modules/clients/client.controller.ts
+
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { SystemRole } from '@repo/database'
 
 import { BadRequestError } from '@/lib/errors/bad-request-error'
 import { UnauthorizedError } from '@/lib/errors/unauthorized-error'
-import { createClient, getClientDetails, getClients } from './client.service'
+import {
+  createClient,
+  getClientDetails,
+  getClients,
+  updateClient,
+} from './client.service'
 import {
   CreateClientBody,
   GetClientParams,
   GetClientsQuery,
+  UpdateClientBody,
 } from './client.schema'
 
 /**
@@ -37,14 +45,39 @@ export async function createClientHandler(
     ensureSystemUser(request)
     const actorId = request.user.sub
 
-    // The `as` type assertion tells TypeScript to trust us that the request body
-    // matches the expected type, which is safe here because Zod has already validated it at the route level.
     const result = await createClient(request.body as CreateClientBody, actorId)
 
     return reply.status(201).send(result)
   } catch (error) {
     if (error instanceof BadRequestError) {
       return reply.status(409).send({ message: error.message })
+    }
+    if (error instanceof UnauthorizedError) {
+      return reply.status(403).send({ message: error.message })
+    }
+    throw error
+  }
+}
+
+/**
+ * Handles the HTTP request to update an existing client's data.
+ */
+export async function updateClientHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  try {
+    ensureSystemUser(request)
+    const actorId = request.user.sub
+    const { id } = request.params as GetClientParams
+    const body = request.body as UpdateClientBody
+
+    const updatedClient = await updateClient(id, body, actorId)
+
+    return reply.status(200).send({ client: updatedClient })
+  } catch (error) {
+    if (error instanceof BadRequestError) {
+      return reply.status(404).send({ message: error.message })
     }
     if (error instanceof UnauthorizedError) {
       return reply.status(403).send({ message: error.message })
@@ -66,7 +99,7 @@ export async function getClientsHandler(
     const { page, limit } = request.query as GetClientsQuery
     const { clients, total } = await getClients(page, limit)
 
-    reply.header('x-total-count', String(total)) // Headers should be strings
+    reply.header('x-total-count', String(total))
     reply.header('x-per-page', String(limit))
     reply.header('x-current-page', String(page))
 

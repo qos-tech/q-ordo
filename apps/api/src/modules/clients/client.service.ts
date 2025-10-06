@@ -1,15 +1,15 @@
+// apps/api/src/modules/clients/client.service.ts
+
 import { hash } from 'bcrypt'
 import { AuditAction, ContactType, prisma } from '@repo/database'
 
 import { BadRequestError } from '@/lib/errors/bad-request-error'
-import { CreateClientBody } from './client.schema'
+import { CreateClientBody, UpdateClientBody } from './client.schema'
 
 /**
  * Handles the business logic for onboarding a new client company and its primary owner.
- * This function is framework-agnostic and focuses purely on business rules.
- *
  * @param input - The validated data for the company and its owner.
- * @param actorId - The ID of the authenticated user (admin) performing the action, for audit purposes.
+ * @param actorId - The ID of the authenticated user (admin) performing the action.
  */
 export async function createClient(input: CreateClientBody, actorId: string) {
   const {
@@ -20,6 +20,7 @@ export async function createClient(input: CreateClientBody, actorId: string) {
     billingContact,
   } = input
 
+  // ... (código existente da função createClient)
   const [existingCompany, existingUser] = await Promise.all([
     prisma.company.findUnique({ where: { taxId: company.taxId } }),
     prisma.user.findUnique({ where: { email: owner.email } }),
@@ -35,7 +36,6 @@ export async function createClient(input: CreateClientBody, actorId: string) {
   const passwordHash = await hash(owner.password, 10)
 
   const result = await prisma.$transaction(async (tx) => {
-    // 1. Create the Company with audit data.
     const newCompany = await tx.company.create({
       data: {
         name: company.name,
@@ -45,7 +45,6 @@ export async function createClient(input: CreateClientBody, actorId: string) {
       },
     })
 
-    // 2. Create the User with audit data.
     const newUser = await tx.user.create({
       data: {
         name: owner.name,
@@ -57,16 +56,10 @@ export async function createClient(input: CreateClientBody, actorId: string) {
       },
     })
 
-    // 3. Create the Membership link with the OWNER role.
     await tx.membership.create({
-      data: {
-        companyId: newCompany.id,
-        userId: newUser.id,
-        role: 'OWNER',
-      },
+      data: { companyId: newCompany.id, userId: newUser.id, role: 'OWNER' },
     })
 
-    // 4. Create the primary General Contact.
     await tx.contact.create({
       data: {
         companyId: newCompany.id,
@@ -80,7 +73,6 @@ export async function createClient(input: CreateClientBody, actorId: string) {
       },
     })
 
-    // 5. Determine the data for and create the primary Billing Contact.
     const billingContactData = billingContactIsSameAsGeneral
       ? generalContact
       : billingContact!
@@ -101,17 +93,14 @@ export async function createClient(input: CreateClientBody, actorId: string) {
     return { companyId: newCompany.id, ownerId: newUser.id }
   })
 
-  // --- NOVA LÓGICA DE AUDITORIA EXPLÍCITA ---
-  // 6. Após o sucesso da transação, criamos um registro explícito no AuditLog.
   await prisma.auditLog.create({
     data: {
       action: AuditAction.CREATE,
       actorId,
-      targetType: 'Company', // A entidade principal da ação.
+      targetType: 'Company',
       targetId: result.companyId,
       details: {
         message: `Admin (ID: ${actorId}) created a new company "${company.name}" and owner user "${owner.name}".`,
-        createdUserId: result.ownerId,
       },
     },
   })
@@ -120,9 +109,96 @@ export async function createClient(input: CreateClientBody, actorId: string) {
 }
 
 /**
+ * Handles the business logic for updating an existing client company.
+ * @param clientId - The ID of the company to update.
+ * @param input - The validated data containing the fields to update.
+ * @param actorId - The ID of the authenticated user (admin) performing the action.
+ */
+export async function updateClient(
+  clientId: string,
+  input: UpdateClientBody,
+  actorId: string,
+) {
+  const { contacts, ...companyData } = input
+
+  // Use a transaction to ensure all updates happen atomically.
+  await prisma.$transaction(async (tx) => {
+    // 1. Update the direct fields of the Company model.
+    await tx.company.update({
+      where: { id: clientId },
+      data: {
+        ...companyData,
+        updatedById: actorId, // Update the audit trail
+      },
+    })
+
+    // 2. Handle the intelligent update of contacts, if provided.
+    if (contacts) {
+      const contactIdsToKeep: string[] = []
+
+      // Loop through the contacts sent in the request
+      for (const contact of contacts) {
+        // Use Prisma's `upsert` for a clean create-or-update logic.
+        const upsertedContact = await tx.contact.upsert({
+          where: { id: contact.id || '' }, // An empty ID ensures this becomes a create operation
+          update: {
+            // Data for updating an existing contact
+            type: contact.type,
+            fullName: contact.fullName,
+            email: contact.email,
+            phone: contact.phone,
+            isPrimary: contact.isPrimary,
+            updatedById: actorId,
+          },
+          create: {
+            // Data for creating a new contact
+            companyId: clientId,
+            type: contact.type,
+            fullName: contact.fullName,
+            email: contact.email,
+            phone: contact.phone,
+            isPrimary: contact.isPrimary,
+            createdById: actorId,
+            updatedById: actorId,
+          },
+        })
+        contactIdsToKeep.push(upsertedContact.id)
+      }
+
+      // 3. Delete any contacts that were associated with the company but were not
+      // included in the update request. This keeps the contact list in sync.
+      await tx.contact.deleteMany({
+        where: {
+          companyId: clientId,
+          id: { notIn: contactIdsToKeep },
+        },
+      })
+    }
+  })
+
+  // After the transaction, create the explicit audit log.
+  await prisma.auditLog.create({
+    data: {
+      action: AuditAction.UPDATE,
+      actorId,
+      targetType: 'Company',
+      targetId: clientId,
+      details: {
+        message: `Admin (ID: ${actorId}) updated client (ID: ${clientId}).`,
+        changes: input, // Store the payload of changes for auditing
+      },
+    },
+  })
+
+  // Return the updated client details.
+  return getClientDetails(clientId)
+}
+
+/**
  * Fetches a paginated list of all client companies.
  */
 export async function getClients(page: number, limit: number) {
+  // ... (código existente da função getClients)
   const [clients, total] = await prisma.$transaction([
     prisma.company.findMany({
       skip: (page - 1) * limit,
@@ -148,6 +224,7 @@ export async function getClients(page: number, limit: number) {
  * Fetches the detailed profile of a single client company by its ID.
  */
 export async function getClientDetails(clientId: string) {
+  // ... (código existente da função getClientDetails)
   const client = await prisma.company.findUnique({
     where: {
       id: clientId,
@@ -182,9 +259,6 @@ export async function getClientDetails(clientId: string) {
   if (!client) {
     throw new BadRequestError('Client not found.')
   }
-
-  // Futuramente, adicionaremos um AuditLog para a ação de VISUALIZAÇÃO aqui.
-  // await prisma.auditLog.create({ data: { action: AuditAction.VIEW, ... } })
 
   return client
 }
