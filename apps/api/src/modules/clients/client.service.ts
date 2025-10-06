@@ -1,5 +1,11 @@
 import { hash } from 'bcrypt'
-import { AuditAction, ContactType, prisma } from '@repo/database'
+import {
+  AuditAction,
+  ContactType,
+  prisma,
+  ServiceStatus,
+  Status,
+} from '@repo/database'
 
 import { BadRequestError } from '@/lib/errors/bad-request-error'
 import { CreateClientBody, UpdateClientBody } from './client.schema'
@@ -119,16 +125,14 @@ export async function updateClient(
   const { contacts, ...companyData } = input
 
   await prisma.$transaction(async (tx) => {
-    // 1. Update the direct fields of the Company model.
     await tx.company.update({
       where: { id: clientId },
       data: {
         ...companyData,
-        updatedById: actorId, // Update the audit trail
+        updatedById: actorId,
       },
     })
 
-    // 2. Handle the intelligent update of contacts, if provided.
     if (contacts) {
       const contactIdsToKeep: string[] = []
 
@@ -157,8 +161,6 @@ export async function updateClient(
         contactIdsToKeep.push(upsertedContact.id)
       }
 
-      // 3. Delete any contacts that were associated with the company but were not
-      // included in the update request.
       await tx.contact.deleteMany({
         where: {
           companyId: clientId,
@@ -182,6 +184,63 @@ export async function updateClient(
   })
 
   return getClientDetails(clientId)
+}
+
+/**
+ * Handles the business logic for inactivating (soft deleting) a client company.
+ * @param clientId - The ID of the company to inactivate.
+ * @param actorId - The ID of the authenticated user (admin) performing the action.
+ */
+export async function deleteClient(clientId: string, actorId: string) {
+  const company = await prisma.company.findUnique({
+    where: { id: clientId },
+  })
+
+  if (!company) {
+    throw new BadRequestError('Client not found.')
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.company.update({
+      where: { id: clientId },
+      data: {
+        status: Status.INACTIVE,
+        updatedById: actorId,
+      },
+    })
+
+    await tx.membership.updateMany({
+      where: { companyId: clientId },
+      data: {
+        status: Status.INACTIVE,
+      },
+    })
+
+    await tx.service.updateMany({
+      where: {
+        companyId: clientId,
+        status: { in: [ServiceStatus.ACTIVE, ServiceStatus.PENDING] },
+      },
+      data: {
+        status: ServiceStatus.CANCELLED,
+        updatedById: actorId,
+      },
+    })
+  })
+
+  await prisma.auditLog.create({
+    data: {
+      action: AuditAction.DELETE,
+      actorId,
+      targetType: 'Company',
+      targetId: clientId,
+      details: {
+        message: `Admin (ID: ${actorId}) inactivated client "${company.name}" (ID: ${clientId}).`,
+      },
+    },
+  })
+
+  return { message: 'Client inactivated successfully.' }
 }
 
 /**

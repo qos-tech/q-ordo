@@ -26,6 +26,14 @@ enum Status {
   SUSPENDED
 }
 
+enum ServiceStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  TERMINATED
+}
+
 enum CompanyRole {
   OWNER
   ADMIN
@@ -107,6 +115,8 @@ model User {
   updatedContacts  Contact[] @relation("UpdatedContacts")
   createdCompanies Company[] @relation("CreatedCompanies")
   updatedCompanies Company[] @relation("UpdatedCompanies")
+  createdServices  Service[] @relation("CreatedServices")
+  updatedServices  Service[] @relation("UpdatedServices")
   // ... (we will add more here as we build other modules)
 
   @@map("users")
@@ -132,6 +142,7 @@ model Membership {
   userId    String      @map("user_id")
   companyId String      @map("company_id")
   role      CompanyRole @default(MEMBER)
+  status    Status      @default(ACTIVE)
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -192,6 +203,7 @@ model Company {
   memberships          Membership[]
   notificationSettings NotificationSetting[]
   contacts             Contact[]
+  services             Service[]
 
   @@map("companies")
 }
@@ -230,6 +242,37 @@ model NotificationSetting {
 
   @@unique([companyId, type, channel])
   @@map("notification_settings")
+}
+
+//
+// service.prisma
+//
+
+// Módulo: Serviços Ativos
+
+model Service {
+  id                  String        @id @default(uuid())
+  status              ServiceStatus @default(PENDING)
+  companyId           String        @map("company_id")
+  productId           String        @map("product_id")
+  pricingId           String        @map("pricing_id")
+  orderId             String?       @unique @map("order_id")
+  nextDueDate         DateTime?     @map("next_due_date")
+  activatedAt         DateTime?     @map("activated_at")
+  provisioningDetails Json?         @map("provisioning_details")
+
+  // Auditoria
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id")
+  updatedById String?  @map("updated_by_id")
+  createdBy   User?    @relation("CreatedServices", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy   User?    @relation("UpdatedServices", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  // Relacionamentos
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("services")
 }
 
 //

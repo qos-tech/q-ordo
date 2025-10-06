@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import {
   createClientHandler,
+  deleteClientHandler,
   getClientDetailsHandler,
   getClientsHandler,
   updateClientHandler,
@@ -11,12 +12,12 @@ import {
 import {
   createClientBodySchema,
   createClientResponseSchema,
+  deleteClientResponseSchema,
   getClientParamsSchema,
   getClientResponseSchema,
   getClientsQuerySchema,
   getClientsResponseSchema,
   updateClientBodySchema,
-  updateClientResponseSchema,
 } from './client.schema'
 
 /**
@@ -26,9 +27,10 @@ import {
 export async function clientRoutes(server: FastifyInstance) {
   const serverWithProvider = server.withTypeProvider<ZodTypeProvider>()
 
+  // --- Routes for /clients ---
+
   /**
    * Route to CREATE a new client.
-   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.post(
     '/',
@@ -36,16 +38,14 @@ export async function clientRoutes(server: FastifyInstance) {
       onRequest: [server.authenticate],
       schema: {
         summary: 'Create a new client',
-        description:
-          'Creates a new client company and its primary owner user. This route is protected and requires authentication.',
         tags: ['Clients'],
         security: [{ bearerAuth: [] }],
         body: createClientBodySchema,
         response: {
           201: createClientResponseSchema,
-          400: z.object({ message: z.string() }), // Validation error
-          403: z.object({ message: z.string() }), // Authorization error
-          409: z.object({ message: z.string() }), // Conflict error (data already exists)
+          400: z.object({ message: z.string() }),
+          403: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }),
         },
       },
     },
@@ -53,32 +53,7 @@ export async function clientRoutes(server: FastifyInstance) {
   )
 
   /**
-   * Route to UPDATE an existing client.
-   * Protected and accessible only by authenticated system users.
-   */
-  serverWithProvider.patch(
-    '/:id',
-    {
-      onRequest: [server.authenticate],
-      schema: {
-        summary: 'Update a client',
-        tags: ['Clients'],
-        security: [{ bearerAuth: [] }],
-        params: getClientParamsSchema,
-        body: updateClientBodySchema,
-        response: {
-          200: updateClientResponseSchema,
-          403: z.object({ message: z.string() }), // Authorization error
-          404: z.object({ message: z.string() }), // Not Found error
-        },
-      },
-    },
-    updateClientHandler,
-  )
-
-  /**
    * Route to LIST all clients with pagination.
-   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.get(
     '/',
@@ -98,9 +73,10 @@ export async function clientRoutes(server: FastifyInstance) {
     getClientsHandler,
   )
 
+  // --- Routes for /clients/:id ---
+
   /**
    * Route to GET the details of a specific client.
-   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.get(
     '/:id',
@@ -114,10 +90,57 @@ export async function clientRoutes(server: FastifyInstance) {
         response: {
           200: getClientResponseSchema,
           403: z.object({ message: z.string() }),
-          404: z.object({ message: z.string() }), // Not Found error
+          404: z.object({ message: z.string() }),
         },
       },
     },
     getClientDetailsHandler,
+  )
+
+  /**
+   * Route to UPDATE an existing client.
+   */
+  serverWithProvider.patch(
+    '/:id',
+    {
+      onRequest: [server.authenticate],
+      schema: {
+        summary: 'Update a client',
+        tags: ['Clients'],
+        security: [{ bearerAuth: [] }],
+        params: getClientParamsSchema,
+        body: updateClientBodySchema,
+        response: {
+          200: getClientResponseSchema, // Reusing the detailed response schema
+          403: z.object({ message: z.string() }),
+          404: z.object({ message: z.string() }),
+        },
+      },
+    },
+    updateClientHandler,
+  )
+
+  /**
+   * Route to DELETE (inactivate) a client.
+   */
+  serverWithProvider.delete(
+    '/:id',
+    {
+      onRequest: [server.authenticate],
+      schema: {
+        summary: 'Inactivate a client',
+        description:
+          'Performs a soft delete on a client by setting their status to INACTIVE.',
+        tags: ['Clients'],
+        security: [{ bearerAuth: [] }],
+        params: getClientParamsSchema,
+        response: {
+          200: deleteClientResponseSchema,
+          403: z.object({ message: z.string() }),
+          404: z.object({ message: z.string() }),
+        },
+      },
+    },
+    deleteClientHandler,
   )
 }

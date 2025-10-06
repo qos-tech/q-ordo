@@ -34,6 +34,8 @@ model User {
   updatedContacts  Contact[] @relation("UpdatedContacts")
   createdCompanies Company[] @relation("CreatedCompanies")
   updatedCompanies Company[] @relation("UpdatedCompanies")
+  createdServices  Service[] @relation("CreatedServices")
+  updatedServices  Service[] @relation("UpdatedServices")
   // ... (we will add more here as we build other modules)
 
   @@map("users")
@@ -59,6 +61,7 @@ model Membership {
   userId    String      @map("user_id")
   companyId String      @map("company_id")
   role      CompanyRole @default(MEMBER)
+  status    Status      @default(ACTIVE)
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)

@@ -5,6 +5,7 @@ import { BadRequestError } from '@/lib/errors/bad-request-error'
 import { UnauthorizedError } from '@/lib/errors/unauthorized-error'
 import {
   createClient,
+  deleteClient,
   getClientDetails,
   getClients,
   updateClient,
@@ -85,6 +86,32 @@ export async function updateClientHandler(
 }
 
 /**
+ * Handles the HTTP request to inactivate (soft delete) a client.
+ */
+export async function deleteClientHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  try {
+    ensureSystemUser(request)
+    const actorId = request.user.sub
+    const { id } = request.params as GetClientParams
+
+    const result = await deleteClient(id, actorId)
+
+    return reply.status(200).send(result)
+  } catch (error) {
+    if (error instanceof BadRequestError) {
+      return reply.status(404).send({ message: error.message })
+    }
+    if (error instanceof UnauthorizedError) {
+      return reply.status(403).send({ message: error.message })
+    }
+    throw error
+  }
+}
+
+/**
  * Handles the HTTP request to fetch a paginated list of clients.
  */
 export async function getClientsHandler(
@@ -97,7 +124,6 @@ export async function getClientsHandler(
     const { page, limit } = request.query as GetClientsQuery
     const { clients, total } = await getClients(page, limit)
 
-    // Add pagination info to the response headers for a better API experience.
     reply.header('x-total-count', String(total))
     reply.header('x-per-page', String(limit))
     reply.header('x-current-page', String(page))

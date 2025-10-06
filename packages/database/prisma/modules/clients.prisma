@@ -24,6 +24,7 @@ model Company {
   memberships          Membership[]
   notificationSettings NotificationSetting[]
   contacts             Contact[]
+  services             Service[]
 
   @@map("companies")
 }

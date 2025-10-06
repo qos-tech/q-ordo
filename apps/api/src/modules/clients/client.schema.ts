@@ -63,6 +63,7 @@ export const createClientBodySchema = z
 
 /**
  * Schema for URL parameters when fetching a single client (e.g., /clients/:id).
+ * Reused for Update and Delete operations.
  */
 export const getClientParamsSchema = z.object({
   id: z.string().uuid('Invalid client ID format.'),
@@ -145,13 +146,13 @@ const clientListItemSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   taxId: z.string(),
-  status: z.nativeEnum(Status), // <-- REFINEMENT: Use nativeEnum for type safety
+  status: z.nativeEnum(Status),
   createdAt: z.date(),
 })
 
 const contactResponseSchema = z.object({
   id: z.string().uuid(),
-  type: z.nativeEnum(ContactType), // <-- REFINEMENT: Use nativeEnum for type safety
+  type: z.nativeEnum(ContactType),
   fullName: z.string(),
   email: z.string().email(),
   phone: z.string().nullable(),
@@ -176,11 +177,14 @@ export const getClientsResponseSchema = z.object({
   clients: z.array(clientListItemSchema),
 })
 
-/**
- * We can reuse the getClientResponseSchema for the successful response of an update,
- * as it already contains all the detailed client information.
- */
 export const updateClientResponseSchema = getClientResponseSchema
+
+/**
+ * Schema for the successful response of the client deletion endpoint.
+ */
+export const deleteClientResponseSchema = z.object({
+  message: z.string(),
+})
 
 // =================================================================
 // TYPESCRIPT TYPES (Types for our application code)

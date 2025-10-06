@@ -1,0 +1,26 @@
+// Módulo: Serviços Ativos
+
+model Service {
+    id                  String        @id @default(uuid())
+    status              ServiceStatus @default(PENDING)
+    companyId           String        @map("company_id")
+    productId           String        @map("product_id")
+    pricingId           String        @map("pricing_id")
+    orderId             String?       @unique @map("order_id")
+    nextDueDate         DateTime?     @map("next_due_date")
+    activatedAt         DateTime?     @map("activated_at")
+    provisioningDetails Json?         @map("provisioning_details")
+
+    // Auditoria
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+    createdById String?  @map("created_by_id")
+    updatedById String?  @map("updated_by_id")
+    createdBy   User?    @relation("CreatedServices", fields: [createdById], references: [id], onDelete: SetNull)
+    updatedBy   User?    @relation("UpdatedServices", fields: [updatedById], references: [id], onDelete: SetNull)
+
+    // Relacionamentos
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    @@map("services")
+}
