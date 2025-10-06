@@ -1,5 +1,5 @@
 model Company {
-  id                    String   @id @default(cuid())
+  id                    String   @id @default(uuid())
   status                Status   @default(ACTIVE)
   name                  String
   taxId                 String   @unique @map("tax_id")
@@ -29,7 +29,7 @@ model Company {
 }
 
 model Contact {
-  id          String      @id @default(cuid())
+  id          String      @id @default(uuid())
   companyId   String      @map("company_id")
   type        ContactType
   fullName    String      @map("full_name")
@@ -52,7 +52,7 @@ model Contact {
 }
 
 model NotificationSetting {
-  id        String              @id @default(cuid())
+  id        String              @id @default(uuid())
   companyId String              @map("company_id")
   type      NotificationType
   channel   NotificationChannel

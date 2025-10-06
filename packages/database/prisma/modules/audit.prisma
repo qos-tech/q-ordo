@@ -1,5 +1,5 @@
 model AuditLog {
-  id         String      @id @default(cuid())
+  id         String      @id @default(uuid())
   createdAt  DateTime    @default(now()) @map("created_at")
   // Quem realizou a ação?
   actorId    String?     @map("actor_id")

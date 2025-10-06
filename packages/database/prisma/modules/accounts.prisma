@@ -1,28 +1,60 @@
+// Module: Accounts & Access
+// Defines the entities that govern authentication, authorization, and user permissions.
+
+// The User model represents an individual who can log in and operate the system.
 model User {
-  id           String      @id @default(cuid())
+  id           String      @id @default(uuid())
   email        String      @unique
   name         String
   phone        String?
   passwordHash String?     @map("password_hash")
   status       Status      @default(ACTIVE)
-  systemRole   SystemRole? @map("system_role") // Para configurar um membro da equipe interna
+  systemRole   SystemRole? @map("system_role") // If not null, this user is an internal team member.
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  // --- AUDIT FIELDS ADDED ---
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id")
+  updatedById String?  @map("updated_by_id")
+  // --- END OF AUDIT FIELDS ---
 
+  // Direct Relationships
   memberships          Membership[]
   notificationSettings UserNotificationSetting[]
+  auditLogs            AuditLog[]
 
-  // --- Relações de Auditoria ---
-  auditLogs        AuditLog[] // O que este usuário fez
-  createdContacts  Contact[]  @relation("CreatedContacts")
-  updatedContacts  Contact[]  @relation("UpdatedContacts")
-  createdCompanies Company[]  @relation("CreatedCompanies")
-  updatedCompanies Company[]  @relation("UpdatedCompanies")
+  // Self-referencing audit relationships
+  createdBy    User?  @relation("CreatedUsers", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy    User?  @relation("UpdatedUsers", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdUsers User[] @relation("CreatedUsers")
+  updatedUsers User[] @relation("UpdatedUsers")
+
+  // Inverse audit relationships (actions this user has performed)
+  createdContacts  Contact[] @relation("CreatedContacts")
+  updatedContacts  Contact[] @relation("UpdatedContacts")
+  createdCompanies Company[] @relation("CreatedCompanies")
+  updatedCompanies Company[] @relation("UpdatedCompanies")
+  // ... (we will add more here as we build other modules)
 
   @@map("users")
 }
 
+// Controls notification preferences for a specific user, overriding company settings.
+model UserNotificationSetting {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  type      NotificationType // The type of notification (e.g., BILLING, SUPPORT)
+  channel   NotificationChannel // The channel (e.g., EMAIL, WHATSAPP)
+  isEnabled Boolean             @default(true) @map("is_enabled") // Is this notification active?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Ensures only one setting exists per user, type, and channel combination.
+  @@unique([userId, type, channel])
+  @@map("user_notification_settings")
+}
+
+// The Membership model is the "glue" that links a client User to a Company.
 model Membership {
   userId    String      @map("user_id")
   companyId String      @map("company_id")
@@ -31,19 +63,7 @@ model Membership {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
+  // Defines a composite primary key, ensuring a user can only be added to a company once.
   @@id([userId, companyId])
   @@map("memberships")
-}
-
-model UserNotificationSetting {
-  id        String              @id @default(cuid())
-  userId    String              @map("user_id")
-  type      NotificationType
-  channel   NotificationChannel
-  isEnabled Boolean             @default(true) @map("is_enabled")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, type, channel])
-  @@map("user_notification_settings")
 }

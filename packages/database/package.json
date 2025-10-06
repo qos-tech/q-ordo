@@ -8,7 +8,7 @@
     "build": "tsup src/index.ts --format cjs --dts",
     "dev": "tsup src/index.ts --format cjs --dts --watch",
     "db:import": "pnpm env:load prisma-import --schemas 'prisma/**/*.prisma' --output 'prisma/schema.prisma' --force",
-    "db:generate": "pnpm run db:import && pnpm prisma generate",
+    "db:generate": "pnpm db:import && pnpm env:load prisma generate",
     "db:studio": "pnpm run db:import && pnpm prisma studio",
     "db:migrate:dev": "pnpm run db:import && pnpm prisma migrate dev",
     "db:migrate:deploy": "pnpm run db:import && pnpm prisma migrate deploy",
@@ -16,7 +16,7 @@
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@prisma/client": "^5.15.0",
+    "@prisma/client": "^6.16.3",
     "@repo/env": "workspace:*"
   },
   "devDependencies": {
@@ -25,7 +25,7 @@
     "@repo/typescript-config": "workspace:*",
     "dotenv-cli": "^7.4.2",
     "pg": "^8.11.5",
-    "prisma": "^5.15.0",
+    "prisma": "^6.16.3",
     "prisma-import": "^1.0.5",
     "tsup": "^8.1.0",
     "typescript": "^5.4.5"
