@@ -1,5 +1,3 @@
-// apps/api/src/modules/clients/client.routes.ts
-
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -30,6 +28,7 @@ export async function clientRoutes(server: FastifyInstance) {
 
   /**
    * Route to CREATE a new client.
+   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.post(
     '/',
@@ -37,14 +36,16 @@ export async function clientRoutes(server: FastifyInstance) {
       onRequest: [server.authenticate],
       schema: {
         summary: 'Create a new client',
+        description:
+          'Creates a new client company and its primary owner user. This route is protected and requires authentication.',
         tags: ['Clients'],
         security: [{ bearerAuth: [] }],
         body: createClientBodySchema,
         response: {
           201: createClientResponseSchema,
-          400: z.object({ message: z.string() }),
-          403: z.object({ message: z.string() }),
-          409: z.object({ message: z.string() }),
+          400: z.object({ message: z.string() }), // Validation error
+          403: z.object({ message: z.string() }), // Authorization error
+          409: z.object({ message: z.string() }), // Conflict error (data already exists)
         },
       },
     },
@@ -53,6 +54,7 @@ export async function clientRoutes(server: FastifyInstance) {
 
   /**
    * Route to UPDATE an existing client.
+   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.patch(
     '/:id',
@@ -66,8 +68,8 @@ export async function clientRoutes(server: FastifyInstance) {
         body: updateClientBodySchema,
         response: {
           200: updateClientResponseSchema,
-          403: z.object({ message: z.string() }),
-          404: z.object({ message: z.string() }),
+          403: z.object({ message: z.string() }), // Authorization error
+          404: z.object({ message: z.string() }), // Not Found error
         },
       },
     },
@@ -76,6 +78,7 @@ export async function clientRoutes(server: FastifyInstance) {
 
   /**
    * Route to LIST all clients with pagination.
+   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.get(
     '/',
@@ -97,6 +100,7 @@ export async function clientRoutes(server: FastifyInstance) {
 
   /**
    * Route to GET the details of a specific client.
+   * Protected and accessible only by authenticated system users.
    */
   serverWithProvider.get(
     '/:id',
@@ -110,7 +114,7 @@ export async function clientRoutes(server: FastifyInstance) {
         response: {
           200: getClientResponseSchema,
           403: z.object({ message: z.string() }),
-          404: z.object({ message: z.string() }),
+          404: z.object({ message: z.string() }), // Not Found error
         },
       },
     },

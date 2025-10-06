@@ -7,12 +7,18 @@ import { Status, ContactType } from '@repo/database'
 
 // --- Schema for CREATION (POST /clients) ---
 
+/**
+ * Reusable schema for contact creation data.
+ */
 const contactCreateSchema = z.object({
   fullName: z.string().min(3),
   email: z.string().email(),
   phone: z.string().optional(),
 })
 
+/**
+ * Schema for the entire body of the client onboarding request.
+ */
 export const createClientBodySchema = z
   .object({
     company: z.object({
@@ -55,10 +61,16 @@ export const createClientBodySchema = z
 
 // --- Schemas for READING (GET /clients) ---
 
+/**
+ * Schema for URL parameters when fetching a single client (e.g., /clients/:id).
+ */
 export const getClientParamsSchema = z.object({
   id: z.string().uuid('Invalid client ID format.'),
 })
 
+/**
+ * Schema for query parameters for the client list endpoint (e.g., /clients?page=2&limit=10).
+ */
 export const getClientsQuerySchema = z.object({
   page: z.coerce
     .number()
@@ -80,7 +92,13 @@ export const getClientsQuerySchema = z.object({
  * If an `id` is provided, it's an update. If not, it's a creation.
  */
 const contactUpdateSchema = z.object({
-  id: z.string().uuid().optional(), // Optional ID for existing contacts
+  id: z
+    .string()
+    .uuid()
+    .optional()
+    .describe(
+      'ID of the contact to update. If omitted, a new contact will be created.',
+    ),
   type: z.nativeEnum(ContactType),
   fullName: z.string().min(3),
   email: z.string().email(),
@@ -93,8 +111,11 @@ const contactUpdateSchema = z.object({
  * All fields are optional, allowing for partial updates.
  */
 export const updateClientBodySchema = z.object({
-  name: z.string().min(3).optional(),
-  status: z.nativeEnum(Status).optional(),
+  name: z.string().min(3).optional().describe("The company's new legal name."),
+  status: z
+    .nativeEnum(Status)
+    .optional()
+    .describe('The new status for the company.'),
   municipalRegistration: z.string().nullable().optional(),
   addressStreet: z.string().nullable().optional(),
   addressNumber: z.string().nullable().optional(),
@@ -103,7 +124,12 @@ export const updateClientBodySchema = z.object({
   addressCity: z.string().nullable().optional(),
   addressState: z.string().nullable().optional(),
   addressZipCode: z.string().nullable().optional(),
-  contacts: z.array(contactUpdateSchema).optional(),
+  contacts: z
+    .array(contactUpdateSchema)
+    .optional()
+    .describe(
+      'An array of contacts to create or update. Any existing contacts not included in this array will be deleted.',
+    ),
 })
 
 // =================================================================
@@ -119,13 +145,13 @@ const clientListItemSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   taxId: z.string(),
-  status: z.nativeEnum(Status),
+  status: z.nativeEnum(Status), // <-- REFINEMENT: Use nativeEnum for type safety
   createdAt: z.date(),
 })
 
 const contactResponseSchema = z.object({
   id: z.string().uuid(),
-  type: z.nativeEnum(ContactType),
+  type: z.nativeEnum(ContactType), // <-- REFINEMENT: Use nativeEnum for type safety
   fullName: z.string(),
   email: z.string().email(),
   phone: z.string().nullable(),

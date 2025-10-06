@@ -1,5 +1,3 @@
-// apps/api/src/modules/clients/client.service.ts
-
 import { hash } from 'bcrypt'
 import { AuditAction, ContactType, prisma } from '@repo/database'
 
@@ -20,7 +18,6 @@ export async function createClient(input: CreateClientBody, actorId: string) {
     billingContact,
   } = input
 
-  // ... (código existente da função createClient)
   const [existingCompany, existingUser] = await Promise.all([
     prisma.company.findUnique({ where: { taxId: company.taxId } }),
     prisma.user.findUnique({ where: { email: owner.email } }),
@@ -121,7 +118,6 @@ export async function updateClient(
 ) {
   const { contacts, ...companyData } = input
 
-  // Use a transaction to ensure all updates happen atomically.
   await prisma.$transaction(async (tx) => {
     // 1. Update the direct fields of the Company model.
     await tx.company.update({
@@ -136,13 +132,10 @@ export async function updateClient(
     if (contacts) {
       const contactIdsToKeep: string[] = []
 
-      // Loop through the contacts sent in the request
       for (const contact of contacts) {
-        // Use Prisma's `upsert` for a clean create-or-update logic.
         const upsertedContact = await tx.contact.upsert({
-          where: { id: contact.id || '' }, // An empty ID ensures this becomes a create operation
+          where: { id: contact.id || '' },
           update: {
-            // Data for updating an existing contact
             type: contact.type,
             fullName: contact.fullName,
             email: contact.email,
@@ -151,7 +144,6 @@ export async function updateClient(
             updatedById: actorId,
           },
           create: {
-            // Data for creating a new contact
             companyId: clientId,
             type: contact.type,
             fullName: contact.fullName,
@@ -166,7 +158,7 @@ export async function updateClient(
       }
 
       // 3. Delete any contacts that were associated with the company but were not
-      // included in the update request. This keeps the contact list in sync.
+      // included in the update request.
       await tx.contact.deleteMany({
         where: {
           companyId: clientId,
@@ -176,7 +168,6 @@ export async function updateClient(
     }
   })
 
-  // After the transaction, create the explicit audit log.
   await prisma.auditLog.create({
     data: {
       action: AuditAction.UPDATE,
@@ -185,12 +176,11 @@ export async function updateClient(
       targetId: clientId,
       details: {
         message: `Admin (ID: ${actorId}) updated client (ID: ${clientId}).`,
-        changes: input, // Store the payload of changes for auditing
+        changes: input,
       },
     },
   })
 
-  // Return the updated client details.
   return getClientDetails(clientId)
 }
 
@@ -198,7 +188,6 @@ export async function updateClient(
  * Fetches a paginated list of all client companies.
  */
 export async function getClients(page: number, limit: number) {
-  // ... (código existente da função getClients)
   const [clients, total] = await prisma.$transaction([
     prisma.company.findMany({
       skip: (page - 1) * limit,
@@ -224,7 +213,6 @@ export async function getClients(page: number, limit: number) {
  * Fetches the detailed profile of a single client company by its ID.
  */
 export async function getClientDetails(clientId: string) {
-  // ... (código existente da função getClientDetails)
   const client = await prisma.company.findUnique({
     where: {
       id: clientId,

@@ -1,5 +1,3 @@
-// apps/api/src/modules/clients/client.controller.ts
-
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { SystemRole } from '@repo/database'
 
@@ -99,6 +97,7 @@ export async function getClientsHandler(
     const { page, limit } = request.query as GetClientsQuery
     const { clients, total } = await getClients(page, limit)
 
+    // Add pagination info to the response headers for a better API experience.
     reply.header('x-total-count', String(total))
     reply.header('x-per-page', String(limit))
     reply.header('x-current-page', String(page))
