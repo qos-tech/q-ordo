@@ -73,6 +73,7 @@ export async function build() {
 
   app.register(fastifyCors, { origin: env.CORS_ORIGIN })
 
+  app.register(authRoutes, { prefix: '/auth' })
   app.register(clientRoutes, { prefix: '/clients' })
 
   return app

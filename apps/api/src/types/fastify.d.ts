@@ -5,6 +5,7 @@ import { CompanyRole, SystemRole } from '@repo/database'
 declare module '@fastify/jwt' {
   export interface FastifyJWT {
     payload: {
+      sub: string
       role: CompanyRole | SystemRole
       companyId?: string
     }

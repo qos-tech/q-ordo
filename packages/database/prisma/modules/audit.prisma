@@ -8,7 +8,7 @@ model AuditLog {
   action     AuditAction
   // Sobre o que foi a ação? (Relação Polimórfica)
   targetType String      @map("target_type") // Ex: "Company", "Invoice", "User"
-  targetId   String      @map("target_id") // O ID do registo alvo
+  targetId   String?     @map("target_id") // O ID do registo alvo
   // Detalhes adicionais (ex: quais campos foram alterados, endereço IP do login, etc.)
   details    Json?
 
