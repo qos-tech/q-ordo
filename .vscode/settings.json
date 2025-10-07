@@ -1,5 +1,4 @@
 {
-  "typescript.tsserver.log": "verbose",
   "workbench.statusBar.visible": false,
   "workbench.editor.showTabs": "single",
   "workbench.editor.enablePreview": false,
@@ -17,5 +16,8 @@
   ],
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
   }
 }

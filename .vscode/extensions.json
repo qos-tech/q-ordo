@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "Prisma.prisma",
     "bradlc.vscode-tailwindcss-intellisense",
+    "csstools.postcss",
     "eamodio.gitlens",
     "mikestead.dotenv",
     "PKief.material-icon-theme"
