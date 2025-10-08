@@ -168,6 +168,7 @@ model AuditLog {
   targetType String      @map("target_type") // Ex: "Company", "Invoice", "User"
   targetId   String?     @map("target_id") // O ID do registo alvo
   // Detalhes adicionais (ex: quais campos foram alterados, endereço IP do login, etc.)
+  ipAddress  String?     @map("ip_address")
   details    Json?
 
   @@map("audit_logs")
@@ -274,7 +275,3 @@ model Service {
 
   @@map("services")
 }
-
-//
-// schema.prisma
-//

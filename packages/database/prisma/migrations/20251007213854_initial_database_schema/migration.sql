@@ -2,6 +2,9 @@
 CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED');
 
 -- CreateEnum
+CREATE TYPE "ServiceStatus" AS ENUM ('PENDING', 'ACTIVE', 'SUSPENDED', 'CANCELLED', 'TERMINATED');
+
+-- CreateEnum
 CREATE TYPE "CompanyRole" AS ENUM ('OWNER', 'ADMIN', 'MEMBER', 'BILLING');
 
 -- CreateEnum
@@ -30,17 +33,10 @@ CREATE TABLE "users" (
     "system_role" "SystemRole",
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_by_id" TEXT,
+    "updated_by_id" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "memberships" (
-    "user_id" TEXT NOT NULL,
-    "company_id" TEXT NOT NULL,
-    "role" "CompanyRole" NOT NULL DEFAULT 'MEMBER',
-
-    CONSTRAINT "memberships_pkey" PRIMARY KEY ("user_id","company_id")
 );
 
 -- CreateTable
@@ -55,13 +51,24 @@ CREATE TABLE "user_notification_settings" (
 );
 
 -- CreateTable
+CREATE TABLE "memberships" (
+    "user_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "role" "CompanyRole" NOT NULL DEFAULT 'MEMBER',
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
+
+    CONSTRAINT "memberships_pkey" PRIMARY KEY ("user_id","company_id")
+);
+
+-- CreateTable
 CREATE TABLE "audit_logs" (
     "id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "actor_id" TEXT,
     "action" "AuditAction" NOT NULL,
     "target_type" TEXT NOT NULL,
-    "target_id" TEXT NOT NULL,
+    "target_id" TEXT,
+    "ip_address" TEXT,
     "details" JSONB,
 
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
@@ -118,6 +125,25 @@ CREATE TABLE "notification_settings" (
     CONSTRAINT "notification_settings_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "services" (
+    "id" TEXT NOT NULL,
+    "status" "ServiceStatus" NOT NULL DEFAULT 'PENDING',
+    "company_id" TEXT NOT NULL,
+    "product_id" TEXT NOT NULL,
+    "pricing_id" TEXT NOT NULL,
+    "order_id" TEXT,
+    "next_due_date" TIMESTAMP(3),
+    "activated_at" TIMESTAMP(3),
+    "provisioning_details" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_by_id" TEXT,
+    "updated_by_id" TEXT,
+
+    CONSTRAINT "services_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -136,14 +162,23 @@ CREATE UNIQUE INDEX "contacts_company_id_email_key" ON "contacts"("company_id", 
 -- CreateIndex
 CREATE UNIQUE INDEX "notification_settings_company_id_type_channel_key" ON "notification_settings"("company_id", "type", "channel");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "services_order_id_key" ON "services"("order_id");
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_notification_settings" ADD CONSTRAINT "user_notification_settings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "memberships" ADD CONSTRAINT "memberships_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "memberships" ADD CONSTRAINT "memberships_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_notification_settings" ADD CONSTRAINT "user_notification_settings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -165,3 +200,12 @@ ALTER TABLE "contacts" ADD CONSTRAINT "contacts_company_id_fkey" FOREIGN KEY ("c
 
 -- AddForeignKey
 ALTER TABLE "notification_settings" ADD CONSTRAINT "notification_settings_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services" ADD CONSTRAINT "services_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services" ADD CONSTRAINT "services_updated_by_id_fkey" FOREIGN KEY ("updated_by_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "services" ADD CONSTRAINT "services_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;

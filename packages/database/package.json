@@ -7,12 +7,13 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs --dts",
     "dev": "tsup src/index.ts --format cjs --dts --watch",
-    "db:import": "pnpm env:load prisma-import --schemas 'prisma/**/*.prisma' --output 'prisma/schema.prisma' --force",
+    "db:import": "pnpm env:load prisma-import --schemas 'prisma/{base,modules}/**/*.prisma' --output 'prisma/schema.prisma' --force",
     "db:generate": "pnpm db:import && pnpm env:load prisma generate",
     "db:studio": "pnpm run db:import && pnpm prisma studio",
     "db:migrate:dev": "pnpm run db:import && pnpm prisma migrate dev",
     "db:migrate:deploy": "pnpm run db:import && pnpm prisma migrate deploy",
     "prisma": "pnpm env:load prisma",
+    "db:seed": "pnpm env:load tsx prisma/seed.ts",
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {
@@ -23,6 +24,8 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "dotenv-cli": "^7.4.2",
     "pg": "^8.11.5",
     "prisma": "^6.16.3",
