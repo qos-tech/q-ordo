@@ -11,7 +11,9 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     JWT_SECRET: z.string(),
   },
-  client: {},
+  client: {
+    NEXT_PUBLIC_API_URL: z.string().default("http://localhost:3303"),
+  },
   clientPrefix: "NEXT_PUBLIC_",
   shared: {},
   runtimeEnv: {
@@ -20,6 +22,7 @@ export const env = createEnv({
     SERVER_PORT: process.env.SERVER_PORT,
     DATABASE_URL: process.env.DATABASE_URL,
     JWT_SECRET: process.env.JWT_SECRET,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
   emptyStringAsUndefined: true,
 });
