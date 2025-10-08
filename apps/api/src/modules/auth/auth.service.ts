@@ -126,3 +126,29 @@ export async function login(input: LoginBody) {
   const { passwordHash: _, ...userWithoutPassword } = user
   return userWithoutPassword
 }
+
+/**
+ * Fetches the profile of the currently authenticated user.
+ * @param userId - The ID of the user (from the JWT subject).
+ * @returns The user's profile information.
+ * @throws An error if the user is not found.
+ */
+export async function getProfile(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    // Selecionamos apenas os campos que queremos expor, excluindo o passwordHash.
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      systemRole: true,
+    },
+  })
+
+  if (!user) {
+    throw new Error('User not found.')
+  }
+
+  return user
+}

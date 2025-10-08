@@ -9,14 +9,13 @@ import { UnauthorizedError } from '@/lib/errors/unauthorized-error'
 import * as authService from './auth.service'
 import { SignUpBody, LoginBody } from './auth.schema'
 
-/**
- * Handles the HTTP request for public user and company signup.
- */
 export async function signUpHandler(
   request: FastifyRequest<{ Body: SignUpBody }>,
   reply: FastifyReply,
 ) {
   try {
+    // Para o signup, o "ator" é o próprio usuário que está a ser criado,
+    // então a auditoria principal é feita no serviço.
     await authService.signUp(request.body)
     return reply
       .status(201)
@@ -30,9 +29,6 @@ export async function signUpHandler(
   }
 }
 
-/**
- * Handles the HTTP request for user login.
- */
 export async function loginHandler(
   request: FastifyRequest<{ Body: LoginBody }>,
   reply: FastifyReply,
@@ -45,30 +41,27 @@ export async function loginHandler(
       select: { companyId: true, role: true },
     })
 
-    // --- LÓGICA DE PERMISSÃO REFINADA ---
     let role: CompanyRole | SystemRole
     let companyId: string | undefined
 
     if (user.systemRole) {
-      // Se o utilizador tem um papel de sistema, esse é o seu papel principal.
       role = user.systemRole
-      companyId = membership?.companyId // Ele pode estar a "observar" uma empresa
+      companyId = membership?.companyId
     } else if (membership) {
-      // Se não, ele deve ser um utilizador de cliente com uma associação ativa.
       role = membership.role
       companyId = membership.companyId
     } else {
-      // Se não for nem um, nem outro, o utilizador está num estado inválido.
       throw new UnauthorizedError('User has no assigned role or membership.')
     }
-    // ------------------------------------
 
+    // Registra o login bem-sucedido com o endereço IP.
     await prisma.auditLog.create({
       data: {
         action: AuditAction.LOGIN_SUCCESS,
         actorId: user.id,
         targetType: 'User',
         targetId: user.id,
+        ipAddress: request.ip, // <-- CAPTURANDO O IP
       },
     })
 
@@ -80,10 +73,12 @@ export async function loginHandler(
 
     return reply.status(200).send({ token })
   } catch (error) {
+    // Registra a tentativa de login falhada com o endereço IP.
     await prisma.auditLog.create({
       data: {
         action: AuditAction.LOGIN_FAILURE,
         targetType: 'User',
+        ipAddress: request.ip, // <-- CAPTURANDO O IP
         details: {
           attemptedEmail: (request.body as LoginBody).email,
           reason: 'Invalid credentials or authorization issue',
@@ -98,6 +93,28 @@ export async function loginHandler(
       return reply.status(403).send({ message: error.message })
     }
 
+    throw error
+  }
+}
+
+/**
+ * Handles the request to get the authenticated user's profile.
+ */
+export async function getProfileHandler(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  try {
+    // O nosso plugin de autenticação garante que `request.user.sub` existe.
+    const userId = request.user.sub
+    const userProfile = await authService.getProfile(userId)
+
+    return reply.status(200).send({ user: userProfile })
+  } catch (error) {
+    // Este erro só aconteceria se o usuário fosse apagado DEPOIS de o token ser gerado.
+    if (error instanceof Error) {
+      return reply.status(404).send({ message: 'User not found.' })
+    }
     throw error
   }
 }

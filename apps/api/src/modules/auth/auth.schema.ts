@@ -1,3 +1,4 @@
+import { SystemRole } from '@repo/database'
 import { z } from 'zod'
 
 // =================================================================
@@ -85,6 +86,19 @@ export const signUpResponseSchema = z.object({
 
 export const loginResponseSchema = z.object({
   token: z.string().describe('The JWT token for authentication.'),
+})
+
+/**
+ * Schema for the successful response of the get authenticated profile endpoint.
+ */
+export const getProfileResponseSchema = z.object({
+  user: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    phone: z.string().nullable(),
+    systemRole: z.nativeEnum(SystemRole).nullable(),
+  }),
 })
 
 // =================================================================
