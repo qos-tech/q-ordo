@@ -47,10 +47,11 @@ export async function authRoutes(server: FastifyInstance) {
    * This is a public endpoint that returns a JWT upon success.
    */
   serverWithProvider.post(
-    '/login',
+    '/password',
     {
       schema: {
-        summary: 'Authenticate a user and get a JWT token',
+        summary:
+          'Authenticate a user with e-mail & password and get a JWT token',
         tags: ['Auth'],
         body: loginBodySchema,
         response: {
@@ -64,14 +65,13 @@ export async function authRoutes(server: FastifyInstance) {
   )
 
   serverWithProvider.get(
-    '/me',
+    '/profile',
     {
-      // A linha mais importante: aplica o nosso plugin de autenticação.
       onRequest: [server.authenticate],
       schema: {
-        summary: "Get authenticated user's profile",
+        summary: 'Get authenticated user profile',
         tags: ['Auth'],
-        security: [{ bearerAuth: [] }], // Indica no Swagger que esta rota precisa de um token.
+        security: [{ bearerAuth: [] }],
         response: {
           200: getProfileResponseSchema,
           404: z.object({ message: z.string() }),

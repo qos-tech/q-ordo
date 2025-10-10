@@ -1,4 +1,4 @@
-import { fastify } from 'fastify'
+import { fastify, type FastifyRequest } from 'fastify'
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -15,6 +15,7 @@ import fastifyCors from '@fastify/cors'
 import { authPlugin } from '@/plugins/auth'
 import { authRoutes } from './modules/auth/auth.routes'
 import { clientRoutes } from './modules/clients'
+import fastifyCookie from '@fastify/cookie'
 
 const loggerConfig =
   env.NODE_ENV === 'development'
@@ -65,13 +66,19 @@ export async function build() {
     })
   }
 
+  app.register(fastifyCookie)
+
   app.register(fastifyJwt, {
     secret: env.JWT_SECRET,
+    cookie: {
+      cookieName: 'q-ordo.token',
+      signed: false,
+    },
   })
 
   app.register(authPlugin)
 
-  app.register(fastifyCors, { origin: env.CORS_ORIGIN })
+  app.register(fastifyCors, { origin: env.CORS_ORIGIN, credentials: true })
 
   app.register(authRoutes, { prefix: '/auth' })
   app.register(clientRoutes, { prefix: '/clients' })

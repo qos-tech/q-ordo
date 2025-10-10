@@ -1,25 +1,26 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { AuthProvider } from '@/contexts/auth-context' // <-- 1. IMPORTE O NOSSO PROVEDOR
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'Q-Ordo',
-  description: 'The modern billing platform.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {/* 2. "EMBRULHE" A NOSSA APLICAÇÃO COM O PROVEDOR */}
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

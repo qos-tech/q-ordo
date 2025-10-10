@@ -8,7 +8,7 @@ export const authPlugin = fp(async function (app: FastifyInstance) {
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
         await request.jwtVerify()
-      } catch (err) {
+      } catch (error) {
         throw new UnauthorizedError('Invalid or expired token.')
       }
     },

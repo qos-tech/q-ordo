@@ -90,6 +90,7 @@ model User {
   phone        String?
   passwordHash String?     @map("password_hash")
   status       Status      @default(ACTIVE)
+  avatarUrl    String?     @map("avatar_url")
   systemRole   SystemRole? @map("system_role") // If not null, this user is an internal team member.
 
   // --- AUDIT FIELDS ADDED ---
