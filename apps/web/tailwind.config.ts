@@ -11,8 +11,8 @@ const config: Config = {
     extend: {
       colors: {
         background: {
-          light: '#f8f7f4', // O nosso "off-white"
-          dark: '#1c1c1c', // O nosso "gray-dark"
+          light: '#f8f7f4',
+          dark: '#1c1c1c',
         },
       },
     },

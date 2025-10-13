@@ -19,7 +19,8 @@ export async function auth() {
 
     return { user }
   } catch (error) {
-    ;(await cookies()).delete('q-ordo.token')
+    redirect('/api/auth/sign-out')
+    // (await cookies()).delete('q-ordo.token')
   }
 
   redirect('/api/auth/sign-out')

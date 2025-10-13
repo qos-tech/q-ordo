@@ -8,7 +8,7 @@ import {
 
 import { SignInForm } from './sign-in-form'
 import Image from 'next/image'
-import qordoLogo from '@/assets/q-ordo_logo.svg'
+import qordoLogo from '@/public/q-ordo_logo.svg'
 
 /**
  * The main page for user sign-in.

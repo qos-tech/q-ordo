@@ -1,16 +1,34 @@
-import { Slash } from 'lucide-react'
 import Image from 'next/image'
 
-import qordoLogo from '@/assets/q-ordo_logo.svg'
+import qLogo from '@/public/qos-icon.png'
+import { Button } from './ui/button'
+import Link from 'next/link'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 /**
  * Renders the Q-Ordo logo icon.
  */
 export function Logo() {
   return (
-    <div className="flex items-center gap-3">
-      <Image src={qordoLogo} className="size-12" alt="Q-Ordo Icon" priority />
-      <Slash className="size-3 -rotate-[24deg] text-zinc-300 dark:text-zinc-700" />
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button asChild variant="ghost" size="icon">
+          {/* 2. O Link do Next.js garante uma navegação rápida no lado do cliente. */}
+          <Link href="/dashboard">
+            <Image
+              src={qLogo}
+              className="size-6"
+              alt="Q-Ordo Icon"
+              priority
+              width={32}
+              height={32}
+            />
+          </Link>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Dashboard</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }

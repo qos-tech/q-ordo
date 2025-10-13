@@ -7,9 +7,6 @@ import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'Q-Ordo',
-  icons: {
-    icon: '/favicon.ico',
-  },
 }
 
 export default async function RootLayout({
