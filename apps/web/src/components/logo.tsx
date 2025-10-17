@@ -14,7 +14,7 @@ export function Logo() {
       <TooltipTrigger asChild>
         <Button asChild variant="ghost" size="icon">
           {/* 2. O Link do Next.js garante uma navegação rápida no lado do cliente. */}
-          <Link href="/dashboard">
+          <Link href="/">
             <Image
               src={qLogo}
               className="size-6"
@@ -27,7 +27,7 @@ export function Logo() {
         </Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Dashboard</p>
+        <p>Home</p>
       </TooltipContent>
     </Tooltip>
   )

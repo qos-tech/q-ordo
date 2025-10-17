@@ -18,7 +18,7 @@ export function Search() {
           <Input
             type="search"
             placeholder="Search..."
-            className="h-8 w-full rounded bg-zinc-100 pl-9 text-zinc-600 dark:bg-zinc-800"
+            className="h-8 w-full rounded border-zinc-400 bg-zinc-200 pl-9 text-zinc-500 dark:border-zinc-500 dark:bg-zinc-700 dark:text-zinc-400"
           />
         </div>
       </TooltipTrigger>

@@ -44,13 +44,13 @@ export function MainMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/clients">
+            <Link href="/clients">
               <Building className="mr-2 size-4" />
               <span>Clients</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/users">
+            <Link href="/users">
               <Users className="mr-2 size-4" />
               <span>Users</span>
             </Link>

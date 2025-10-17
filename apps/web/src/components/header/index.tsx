@@ -15,7 +15,8 @@ export function Header() {
   return (
     // A CORREÇÃO ESTÁ AQUI: O <header> agora é o nosso contentor flex principal.
     // Ele tem o padding, a altura e o justify-between.
-    <header className="flex h-12 items-center justify-between border-b bg-white px-2 dark:border-zinc-800 dark:bg-zinc-950">
+    // <header className="flex h-12 items-center justify-between border-b bg-white px-2 dark:border-zinc-800 dark:bg-zinc-950">
+    <header className="flex h-12 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 sm:px-6 lg:px-8 dark:border-zinc-700 dark:bg-zinc-950">
       <TooltipProvider delayDuration={100}>
         <div className="flex items-center gap-1">
           <MainMenu />

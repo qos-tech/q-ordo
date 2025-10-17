@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { isAuthenticated } from '@/auth/auth'
+import { Header } from '@/components/header'
 
 export default function AppLayout({
   children,
@@ -14,9 +15,9 @@ export default function AppLayout({
   }
 
   return (
-    <>
-      {children}
-      {sheet}
-    </>
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
+      <Header />
+      <main>{children}</main>
+    </div>
   )
 }

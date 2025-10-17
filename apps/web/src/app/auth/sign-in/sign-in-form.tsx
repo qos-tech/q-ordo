@@ -24,7 +24,7 @@ export function SignInForm() {
     signInWithEmailAndPassword,
     () => {
       // On successful login, redirect to the main dashboard.
-      router.push('/dashboard')
+      router.push('/')
     },
   )
 

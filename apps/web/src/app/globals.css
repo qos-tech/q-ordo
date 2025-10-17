@@ -118,4 +118,48 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Remove o ícone de "olho" padrão do campo de senha no Edge/IE */
+  input[type='password']::-ms-reveal,
+  input[type='password']::-ms-clear {
+    display: none;
+  }
+
+  /* --- A NOSSA NOVA REGRA PARA O "X" DA BARRA DE PESQUISA --- */
+
+  /* Esconde o ícone de "cancelar pesquisa" padrão em todos os navegadores */
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-decoration,
+  input[type='search']::-webkit-search-results-button,
+  input[type='search']::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Adicionamos o nosso próprio "X" personalizado, visível apenas quando há texto */
+  input[type='search'] {
+    --cancel-button-display: none; /* Começa escondido por padrão */
+  }
+
+  input[type='search']:not(:placeholder-shown) {
+    --cancel-button-display: block; /* Aparece quando o placeholder desaparece (ou seja, quando há texto) */
+  }
+
+  input[type='search']::-webkit-search-cancel-button {
+    display: var(--cancel-button-display);
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1rem; /* 16px */
+    width: 1rem; /* 16px */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  input[type='search']::-webkit-search-cancel-button:hover {
+    opacity: 1;
+  }
 }

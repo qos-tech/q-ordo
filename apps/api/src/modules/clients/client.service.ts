@@ -247,23 +247,39 @@ export async function deleteClient(clientId: string, actorId: string) {
  * Fetches a paginated list of all client companies.
  */
 export async function getClients(page: number, limit: number) {
-  const [clients, total] = await prisma.$transaction([
+  const [companies, total] = await prisma.$transaction([
     prisma.company.findMany({
       skip: (page - 1) * limit,
       take: limit,
-      select: {
-        id: true,
-        name: true,
-        taxId: true,
-        status: true,
-        createdAt: true,
+      include: {
+        contacts: {
+          where: { isPrimary: true, type: ContactType.GENERAL },
+          select: {
+            email: true,
+            phone: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc',
+        name: 'desc',
       },
     }),
     prisma.company.count(),
   ])
+
+  const clients = companies.map((company) => {
+    const primaryContact = company.contacts[0]
+    return {
+      id: company.id,
+      name: company.name,
+      taxId: company.taxId,
+      status: company.status,
+      city: company.addressCity,
+      createdAt: company.createdAt,
+      contactEmail: primaryContact?.email,
+      contactPhone: primaryContact?.phone,
+    }
+  })
 
   return { clients, total }
 }
